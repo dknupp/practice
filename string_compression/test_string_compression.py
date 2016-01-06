@@ -41,7 +41,7 @@ def random_string():
 
 
 @pytest.fixture
-def compressable_string():
+def compressible_string():
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
     return ''.join([char * 50 for char in alphabet])
 
@@ -62,21 +62,41 @@ def test_groupby_compress(simple_string):
     assert groupby_compress(simple_string) == compressed
 
 
-def test_groupby_time_compressable(compressable_string):
-    target = function_timer(groupby_compress, compressable_string)
-    print timeit.timeit(target, number=10000)
+def test_groupby_time_compressible(compressible_string):
+    target = function_timer(groupby_compress, compressible_string)
+    print '{} {} '.format('time for 10K iterations:', timeit.timeit(target, number=10000)),
 
 
-def test_iterative_time_compressable(compressable_string):
-    target = function_timer(iterative_compress, compressable_string)
-    print timeit.timeit(target, number=10000)
+def test_iterative_time_compressible(compressible_string):
+    target = function_timer(iterative_compress, compressible_string)
+    print '{} {} '.format('time for 10K iterations:', timeit.timeit(target, number=10000)),
 
 
 def test_groupby_time_random(random_string):
     target = function_timer(groupby_compress, random_string)
-    print timeit.timeit(target, number=10000)
+    print '{} {} '.format('time for 10K iterations:', timeit.timeit(target, number=10000)),
 
 
 def test_iterative_time_random(random_string):
     target = function_timer(iterative_compress, random_string)
-    print timeit.timeit(target, number=10000)
+    print '{} {} '.format('time for 10K iterations:', timeit.timeit(target, number=10000)),
+
+
+'''
+$ py.test -sv test_string_compression.py
+=================================================================================== test session starts ===================================================================================
+platform darwin -- Python 2.7.11, pytest-2.8.5, py-1.4.31, pluggy-0.3.1 -- /Users/dknupp/venvs/dev/bin/python2.7
+cachedir: .cache
+rootdir: /Users/dknupp/Documents/code/practice/string_compression, inifile:
+plugins: cov-2.2.0
+collected 6 items
+
+test_string_compression.py::test_iterative_compress PASSED
+test_string_compression.py::test_groupby_compress PASSED
+test_string_compression.py::test_groupby_time_compressible time for 10K iterations: 0.768487930298 PASSED
+test_string_compression.py::test_iterative_time_compressible time for 10K iterations: 0.999316930771 PASSED
+test_string_compression.py::test_groupby_time_random time for 10K iterations: 15.9000580311 PASSED
+test_string_compression.py::test_iterative_time_random time for 10K iterations: 2.41410493851 PASSED
+
+================================================================================ 6 passed in 20.09 seconds ================================================================================
+'''
