@@ -46,6 +46,7 @@ def compressible_string():
     return ''.join([char * 50 for char in alphabet])
 
 
+# Helper function
 def function_timer(func, *args, **kwargs):
     def wrapped_func():
         return func(*args, **kwargs)
@@ -62,41 +63,46 @@ def test_groupby_compress(simple_string):
     assert groupby_compress(simple_string) == compressed
 
 
-def test_groupby_time_compressible(compressible_string):
-    target = function_timer(groupby_compress, compressible_string)
-    print '{} {} '.format('time for 10K iterations:', timeit.timeit(target, number=10000)),
+@pytest.mark.parametrize('input_type',
+                         [simple_string, compressible_string, random_string])
+def test_compression_results_match(input_type):
+    print '%s ' % input_type.__name__,
+    groupby_results = groupby_compress(input_type())
+    iterative_results = iterative_compress(input_type())
+    assert groupby_results == iterative_results
 
 
-def test_iterative_time_compressible(compressible_string):
-    target = function_timer(iterative_compress, compressible_string)
-    print '{} {} '.format('time for 10K iterations:', timeit.timeit(target, number=10000)),
+@pytest.mark.parametrize('input_type',
+                         [simple_string, compressible_string, random_string])
+def test_compression_time_10k_iterations(input_type):
+    print '%s --' % input_type.__name__,
 
+    groupby_timer = function_timer(groupby_compress, input_type())
+    groupby_results = timeit.timeit(groupby_timer, number=10000)
 
-def test_groupby_time_random(random_string):
-    target = function_timer(groupby_compress, random_string)
-    print '{} {} '.format('time for 10K iterations:', timeit.timeit(target, number=10000)),
+    iteration_timer = function_timer(iterative_compress, input_type())
+    iteration_results = timeit.timeit(iteration_timer, number=10000)
 
-
-def test_iterative_time_random(random_string):
-    target = function_timer(iterative_compress, random_string)
-    print '{} {} '.format('time for 10K iterations:', timeit.timeit(target, number=10000)),
+    print 'groupby: {} iteration: {} '.format(groupby_results, iteration_results),
 
 
 '''
 $ py.test -sv test_string_compression.py
-=================================================================================== test session starts ===================================================================================
+==================================================================================== test session starts ====================================================================================
 platform darwin -- Python 2.7.11, pytest-2.8.5, py-1.4.31, pluggy-0.3.1 -- /Users/dknupp/venvs/dev/bin/python2.7
 cachedir: .cache
 rootdir: /Users/dknupp/Documents/code/practice/string_compression, inifile:
 plugins: cov-2.2.0
-collected 6 items
+collected 8 items
 
 test_string_compression.py::test_iterative_compress PASSED
 test_string_compression.py::test_groupby_compress PASSED
-test_string_compression.py::test_groupby_time_compressible time for 10K iterations: 0.768487930298 PASSED
-test_string_compression.py::test_iterative_time_compressible time for 10K iterations: 0.999316930771 PASSED
-test_string_compression.py::test_groupby_time_random time for 10K iterations: 15.9000580311 PASSED
-test_string_compression.py::test_iterative_time_random time for 10K iterations: 2.41410493851 PASSED
+test_string_compression.py::test_compression_results_match[input_type0] simple_string PASSED
+test_string_compression.py::test_compression_results_match[input_type1] compressible_string PASSED
+test_string_compression.py::test_compression_results_match[input_type2] random_string PASSED
+test_string_compression.py::test_compression_time_10k_iterations[input_type0] simple_string -- groupby: 0.074786901474 iteration: 0.0289478302002 PASSED
+test_string_compression.py::test_compression_time_10k_iterations[input_type1] compressible_string -- groupby: 0.737244129181 iteration: 1.03705096245 PASSED
+test_string_compression.py::test_compression_time_10k_iterations[input_type2] random_string -- groupby: 15.5530238152 iteration: 2.28075313568 PASSED
 
-================================================================================ 6 passed in 20.09 seconds ================================================================================
+================================================================================= 8 passed in 19.73 seconds =================================================================================
 '''
