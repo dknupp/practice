@@ -87,6 +87,7 @@ def test_compression_time_10k_iterations(input_type):
 
 
 '''
+TEST OUTPUT:
 $ py.test -sv test_string_compression.py
 ==================================================================================== test session starts ====================================================================================
 platform darwin -- Python 2.7.11, pytest-2.8.5, py-1.4.31, pluggy-0.3.1 -- /Users/dknupp/venvs/dev/bin/python2.7
